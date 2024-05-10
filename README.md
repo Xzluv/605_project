@@ -9,7 +9,7 @@
 
 ## Description
 
-Explore RapidMiner for data mining and analysis. Choose a dataset and perform data preprocessing, transformation, and visualization using RapidMiner's visual interface. Apply a machine learning algorithm for classification or clustering. Analyze and interpret the results. Explore different techniques and create a complex project.
+Explore RapidMiner for data mining and analysis. Choose the Bank Market  Dataset (from UCI Machine Learning Repository) and perform data preprocessing, transformation, and visualization using RapidMiner's visual interface. Apply a machine learning algorithm for classification. Analyze and interpret the results. Explore different techniques and create a complex project.
 
 ## Technologies
 
@@ -92,50 +92,50 @@ Explore RapidMiner for data mining and analysis. Choose a dataset and perform da
 
 ## Rapidminer Process
 
+I have used Rapidminer to build a process to explore and process the data and apply its own machine learning algorithm and different algorithms in python for binary classification respectively. The dataset I used is Bank Marketing Dataset from UCI Machine Learning Repository.Here is the flowchart of my Process
 
-
-![Process](/Process.png)
-- Statistics : In this step, the data is first analyzed statistically in order to understand 
+![Process](/plots/Process.png)
+- **Statistics** : In this step, the data is first analyzed statistically in order to understand 
   the basic characteristics and distribution of the data. Then the missing values in the data are processed using the Replace Missing Values operator, which is done with mean padding.
-- Set Role: Set the role of each column in the data, in this data set y is the label.
-【tupian】标签的统计
-- It can be seen that there is a large gap between the number of samples labeled yes and no. In 
-  a binary classification problem, if the number of samples for one label is much larger than the other, this situation is known as class imbalance (CLASS IMBALANCE). Class imbalance can have a significant impact on the training and performance of the model. So next I resampled the data of NO.
+- **Set Role**: Set the role of each column in the data, in this data set y is the label.
+![Process](/plots/y.png)
+- It can be seen that there is a large gap between the number of samples labeled `yes` and `no`. 
+- In a binary classification problem, if the number of samples for one label is much larger than the other, this situation is known as class imbalance (CLASS IMBALANCE). Class imbalance can have a significant impact on the training and performance of the model. 
+- So next I resampled the data of `no`.
 
-- Filter Examples: Use the “Filter Examples” action to select the labeled data that I want to 
-  sampleno
-- Sample (Bootstrapping): Connect the filtered data to the “Sample (Bootstrapping)” operation. 
-  Set the parameter of “Sample (Bootstrapping)” operation, the sample size is 5200, which is equivalent to the number of yes samples.
+- **Filter Examples**: Use the “Filter Examples” action to select the labeled data that I want to sample.
+- **Sample (Bootstrapping)**: Connect the filtered data to the “Sample (Bootstrapping)” operation. Set the parameter of “Sample (Bootstrapping)” operation, the sample size is 5200, which is equivalent to the number of yes samples.
 
-- Append: Append: Once the sampling is complete, the sampled data needs to be re-merged with 
-  the unsampled data to maintain the integrity of the dataset.Use the “Append” operation to merge the unsampled data (using the complement of the first “Filter Examples” operation) with the sampled data.
+- **Append**: Append: Once the sampling is complete, the sampled data needs to 
+  be re-merged with the unsampled data to maintain the integrity of the dataset.Use the “Append” operation to merge the unsampled data (using the complement of the first “Filter Examples” operation) with the sampled data.
 
-- Generate Attributes: I used this operator to construct a derived attribute of “Total Debt 
-  Profile”, calculated from Personal Loans + Housing Loans, to combine to enhance the predictive power of the model.
+- **Generate Attributes**: I used this operator to construct a derived attribute of `total_loan`, calculated from Personal `loan` + `housing` , to combine to enhance the predictive power of the model.
 
-- Discretize: use this operator to bin (Binning) age to discretize it, allowing the data to 
+- **Discretize**: use this operator to bin (Binning) age to discretize it, allowing the data to 
   focus on a certain type of age group, rather than a characteristic age value, which is more in line with realistic behavioral traits such as youth, middle age, and old age.
 
-- Nominal to Numerical: Converts nominal features (category variables) to numerical values so 
-  that they can be used later in the model.
-- Normalize: I chose to pair DURATION and BALANCE, which statistically show that their scales
- span a relatively large range, and normalizing them to ensure that the scales of the different features are consistent will help the model learn and predict better.
+- **Nominal to Numerical**: Converts nominal features (category variables) to numerical values so that they can be used later in the model.
 
-【图片】
+- **Normalize**: I chose to pair `duration` and `bbalance`, which statistically show that their scales span a relatively large range, and normalizing them to ensure that the scales of the different features are consistent will help the model learn and predict better.
+![bar](/plots/Balance_and_Duration_about_Job.png)
+- After regularization, balances and durations are shown together, and it can be seen that there is a correlation between occupations and balances, with most occupations having lower balances, but a few occupational categories (e.g., those labeled 3 and 4) show higher average account balances, which may indicate that customers in these occupations have higher financial strengths, and that they are more likely to subscribe to a bank's time deposit product, i.e. may be categorized as `yes`.
 
-- Select Attributes: select important features to be used for model training, I have removed 
+- **Select Attributes**: select important features to be used for model training, I have removed 
   the individual date day, contact and defaul as they have very little impact on whether or not a customer will subscribe to a bank's time deposit product.
-- Split Data: Split the data into a training set and a test set according to 8:2, which is used 
+![Heatmap](/plots/Heatmap.png)
+- As can be seen on the heat map, most of the rows marked `yes` in the upper part of the heat map show light yellow and darker colors, indicating higher eigenvalues (duration) in these rows. In the lower rows marked `no`, the color is generally closer to blue, indicating lower eigenvalues.
+-  This may mean that the results tend to be `yes` when the duration increases, and `no` when the duration is lower, suggesting that duration can be a good choice for attributes.
+
+- **Split Data**: Split the data into a training set and a test set according to 8:2, which is used 
   to evaluate the generalization ability of the model.。
 
 - The following section is about binary classification using machine learning algorithms, on 
   Rapidminer my algorithm of choice is neural networks.
 
-- Neural Net: model training using a neural network with a learning rate set to 0.01 and a 
+- **Neural Net**: model training using a neural network with a learning rate set to 0.01 and a 
   training period of 200, with two hidden layers, the first with 30 neurons and the second with 10 neurons.
-- Apply Model: Apply the trained model to new data, make predictions, and then evaluate the 
-  model's performance using Performance
-【图片，神经网络】
+- **Apply Model**: Apply the trained model to new data, make predictions, and then evaluate the model's performance using Performance
+![NN](/plots/accuracy.png)
 - It can be seen that there is a good performance in terms of accuracy good recall, which 
   indicates that the characteristics of the data have been analyzed using rapidminer, 
   and the data has been processed appropriately to better sample the category, i.e., whether or not the customer will subscribe to the bank's time deposit product.
@@ -144,10 +144,9 @@ Explore RapidMiner for data mining and analysis. Choose a dataset and perform da
 
 The Python script (605_pro.py) is designed to perform a complete machine learning process on top of the data processed in Rapidminer, using a different algorithm than the one in Rapidminer, the Random Forest Classifier, to solve a binary classification problem. To differentiate the performance on the model.
 
-- 它首先加载由Rapidminer处理过的CSV格式的数据集，省去了数据处理的麻烦。然后按照一定比例（8:2）将数据分割成训练集和测试集。数据预处理包括将分类标签转换为二进制形式，并对特征进行适当的转换。
+- It first loads the dataset in CSV format processed by Rapidminer to save the trouble of data processing. Then it splits the data into training set and test set according to a certain ratio (8:2).
 
-- Next, the script is trained using a random forest model with parameters that are preset or can
- be adjusted as needed. After training, the script evaluates the performance of the model using the test set data, calculates metrics such as accuracy, precision, recall, and F1 score, and generates a confusion matrix and ROC curve to further analyze the model performance.
+- Next, the script is trained using a random forest model with parameters that are preset or can be adjusted as needed. After training, the script evaluates the performance of the model using the test set data, calculates metrics such as accuracy, precision, recall, and F1 score, and generates a confusion matrix and ROC curve to further analyze the model performance.
 
 ```
 # Instantiate the model
@@ -158,20 +157,26 @@ rf_classifier.fit(X_train, y_train)
 
 # Predict on the test set
 y_pred = rf_classifier.predict(X_test)
+
+# Calculate metrics
+accuracy = accuracy_score(y_test, y_pred)
+precision = precision_score(y_test, y_pred)
+recall = recall_score(y_test, y_pred)
+f1 = f1_score(y_test, y_pred)
 ```
 
-- 此外，脚本还包括一个特征重要性的分析，帮助理解哪些特征对预测结果有较大的影响。这个脚本为机
-  器学习的二元分类问题提供了一个全面的解决方案，适用于需要精确控制数据处理和模型评估步骤的场景。
+- In addition, the script includes a feature importance analysis to help understand which features have a greater impact on the prediction results. This script builds on Rapidminer's processing of data to provide a comprehensive solution to the binary classification problem of machine learning for scenarios that require precise control over data processing and model evaluation steps.
 
 
-![Confusion_Matrix](/Confusion_Matrix.png)
-- 这是模型的混淆矩阵。它展示了真实类别与模型预测类别之间的关系
+![Confusion_Matrix](/plots/Confusion_Matrix.png)
+- This is the confusion matrix for the model output. It shows the relationship between the true categories and the model-predicted categories.
 
-![ROC](/ROC%20Curve.png)
-- 这是模型的接收器操作特征（ROC）曲线，曲线下面积（AUC）为0.90，表明模型具有较好的区分正负样本的能力。
+![ROC](/plots/ROC%20Curve.png)
+- It is the receiver operating characteristic (ROC) curve of the model, and the area under the curve (AUC) is 0.90, indicating that the model has a good ability to distinguish between positive and negative samples.
 
-![Weight](/Feature_Importance.png)
-- 这个图显示了随机森林模型中各特征的重要性。通过这种方式，我们可以看出哪些特征对于预测结果更为关键。比如图中最顶部的特征具有最高的重要性
+![Weight](/plots/Feature_Importance.png)
+- This figure shows the importance of each feature in the Random Forest model, in such a way that it is possible to see which features are more critical to the prediction results.
+- It can be seen that the duraion feature has the highest importance and has a large impact on the prediction results, which matches the results shown in the previous heat map.
 
 ## Conclusion
 
