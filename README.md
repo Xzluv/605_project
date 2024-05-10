@@ -35,9 +35,12 @@ Explore RapidMiner for data mining and analysis. Choose a dataset and perform da
   using containers.
 - Docker streamlines the development process by allowing developers to work in standardized 
   environments using local containers which provide your applications and services. 
--  Docker can use Dockerfile to build images automatically by reading the instructions from a Dockerfile, a text document that contains all the commands a user could call on the command line to assemble an image.
-- The Dockerfile specifies the use of an official Python runtime as the base image, and copies the Python script into the container. The resulting Docker image encapsulates the entire project, making it easily deployable and scalable.
-- Docker provides Docker Compose, a tool for defining and running multi-container Docker applications. With Compose, you use a YAML file to configure your application's services, networks, and volumes, and then with a single command, you create and start all the services from your configuration​ 
+-  Docker can use Dockerfile to build images automatically by reading the instructions from a 
+  Dockerfile, a text document that contains all the commands a user could call on the command line to assemble an image.
+- The Dockerfile specifies the use of an official Python runtime as the base image, and copies 
+  the Python script into the container. The resulting Docker image encapsulates the entire project, making it easily deployable and scalable.
+- Docker provides Docker Compose, a tool for defining and running multi-container Docker
+ applications. With Compose, you use a YAML file to configure your application's services, networks, and volumes, and then with a single command, you create and start all the services from your configuration​ 
 
 ## Docker implementation
 
@@ -89,34 +92,62 @@ Explore RapidMiner for data mining and analysis. Choose a dataset and perform da
 
 ## Rapidminer Process
 
+
+
 ![Process](/Process.png)
+- Statistics : In this step, the data is first analyzed statistically in order to understand 
+  the basic characteristics and distribution of the data. Then the missing values in the data are processed using the Replace Missing Values operator, which is done with mean padding.
+- Set Role: Set the role of each column in the data, in this data set y is the label.
+【tupian】标签的统计
+- It can be seen that there is a large gap between the number of samples labeled yes and no. In 
+  a binary classification problem, if the number of samples for one label is much larger than the other, this situation is known as class imbalance (CLASS IMBALANCE). Class imbalance can have a significant impact on the training and performance of the model. So next I resampled the data of NO.
 
+- Filter Examples: Use the “Filter Examples” action to select the labeled data that I want to 
+  sampleno
+- Sample (Bootstrapping): Connect the filtered data to the “Sample (Bootstrapping)” operation. 
+  Set the parameter of “Sample (Bootstrapping)” operation, the sample size is 5200, which is equivalent to the number of yes samples.
 
-- Statistics：在此步骤中，对数据进行统计分析，以便了解数据的基本特征和分布。
-- Replace Missing Values：这一步骤处理数据中的缺失值，可能通过插值、删除或用平均值/中位数填充等方式进行。
-- Set Role：设定数据中各列的角色，在此数据集中y是标签。
+- Append: Append: Once the sampling is complete, the sampled data needs to be re-merged with 
+  the unsampled data to maintain the integrity of the dataset.Use the “Append” operation to merge the unsampled data (using the complement of the first “Filter Examples” operation) with the sampled data.
 
+- Generate Attributes: I used this operator to construct a derived attribute of “Total Debt 
+  Profile”, calculated from Personal Loans + Housing Loans, to combine to enhance the predictive power of the model.
 
-- Generate Attributes：我用这个操作符构建了一个“总负债情况”的派生特征，通过个人贷款+住房贷款计算得来，以组合来增强模型的预测能力。
-- Select Attributes：选择重要的特征用于模型训练，这可能基于特征重要性或其他选择标准。
-- Discretize：将连续变量离散化，以适应某些模型的需求，或简化数据结构。
-- Nominal to Numerical：将名义特征（类别变量）转换为数值，以便可以用于数学模型。
-- Normalize：对数据进行归一化或标准化处理，确保不同特征的尺度一致，有助于模型更好地学习和预测。
-- Split Data：将数据分割为训练集和测试集，这通常用于评估模型的泛化能力。
+- Discretize: use this operator to bin (Binning) age to discretize it, allowing the data to 
+  focus on a certain type of age group, rather than a characteristic age value, which is more in line with realistic behavioral traits such as youth, middle age, and old age.
 
-下面的部分是用机器学习的算法进行二元分类，于Python不同，为了测试不同算法模型的好坏，在Rapidminer上我所选择的算法是神经网络。
+- Nominal to Numerical: Converts nominal features (category variables) to numerical values so 
+  that they can be used later in the model.
+- Normalize: I chose to pair DURATION and BALANCE, which statistically show that their scales
+ span a relatively large range, and normalizing them to ensure that the scales of the different features are consistent will help the model learn and predict better.
 
-- Neural Net：使用神经网络进行模型训练。
-- Apply Model：将训练好的模型应用到新数据上，进行预测。
-- Performance：评估模型的性能，通常包括准确度、召回率、精确率等指标。
+【图片】
+
+- Select Attributes: select important features to be used for model training, I have removed 
+  the individual date day, contact and defaul as they have very little impact on whether or not a customer will subscribe to a bank's time deposit product.
+- Split Data: Split the data into a training set and a test set according to 8:2, which is used 
+  to evaluate the generalization ability of the model.。
+
+- The following section is about binary classification using machine learning algorithms, on 
+  Rapidminer my algorithm of choice is neural networks.
+
+- Neural Net: model training using a neural network with a learning rate set to 0.01 and a 
+  training period of 200, with two hidden layers, the first with 30 neurons and the second with 10 neurons.
+- Apply Model: Apply the trained model to new data, make predictions, and then evaluate the 
+  model's performance using Performance
+【图片，神经网络】
+- It can be seen that there is a good performance in terms of accuracy good recall, which 
+  indicates that the characteristics of the data have been analyzed using rapidminer, 
+  and the data has been processed appropriately to better sample the category, i.e., whether or not the customer will subscribe to the bank's time deposit product.
 
 ## Python Script Overview
 
-这个Python脚本（605_pro.py）是为了在Rapidminer处理过的数据的基础上执行一个完整的机器学习流程，使用与在Rapidminer中的不同的算法——随机森林分类器来解决一个二元分类问题。以此不同模型上的性能。
+The Python script (605_pro.py) is designed to perform a complete machine learning process on top of the data processed in Rapidminer, using a different algorithm than the one in Rapidminer, the Random Forest Classifier, to solve a binary classification problem. To differentiate the performance on the model.
 
 - 它首先加载由Rapidminer处理过的CSV格式的数据集，省去了数据处理的麻烦。然后按照一定比例（8:2）将数据分割成训练集和测试集。数据预处理包括将分类标签转换为二进制形式，并对特征进行适当的转换。
 
-- 接下来，脚本使用随机森林模型进行训练，模型的参数已经预设或可以根据需要调整。训练完成后，脚本使用测试集数据评估模型的性能，计算准确率、精确率、召回率和F1分数等指标，并生成混淆矩阵和ROC曲线来进一步分析模型表现。
+- Next, the script is trained using a random forest model with parameters that are preset or can
+ be adjusted as needed. After training, the script evaluates the performance of the model using the test set data, calculates metrics such as accuracy, precision, recall, and F1 score, and generates a confusion matrix and ROC curve to further analyze the model performance.
 
 ```
 # Instantiate the model
@@ -144,3 +175,4 @@ y_pred = rf_classifier.predict(X_test)
 
 ## Conclusion
 
+The Data Mining with Rapidminer project effectively combines the strengths of RapidMiner,Python, and Docker to create a robust data mining solution that is both efficient and scalable. By leveraging RapidMiner's powerful data analysis capabilities, the project significantly enhances our ability to uncover insights and patterns from complex datasets. Python scripts facilitate the automation of data processing and analysis tasks, ensuring seamless data flow and integration. Docker's containerization providing a consistent and portable environment across various platforms which simplifies the implementation and maintenance of the application.
